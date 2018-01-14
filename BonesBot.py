@@ -19,17 +19,8 @@ boneshelp = '**BonesBot** version PRE-ALPHA 1 by GunnerBones \n\n**!anysizelist 
 
 # Global Methods
 
-def is_int(a):
-    try:
-        a = int(a)
-    except ValueError:
-        return False
-    else:
-        return True
-
 def check_all_perms():
-    print()
-    print('All servers connected to with permissions:')
+    print('\nAll servers connected to with permissions:')
     for server in client.servers:
         hrole = server.me.top_role
         print(server.name + ': ' + str(hrole))
@@ -38,18 +29,14 @@ def serverstats():
     for server in client.servers:
         try:
             servname = 'bonesbot-' + server.id + '-demonlist.txt'
-            f = open(servname,'a')
             sortsn = 'serverstats/' + servname
-            f.close()
             os.rename(servname,sortsn)
         except:
             os.remove(servname)
     for server in client.servers:
         try:
             servname = 'bonesbot-' + server.id + '-hasdl.txt'
-            f = open(servname,'a')
             sortsn = 'serverstats/' + servname
-            f.close()
             os.rename(servname,sortsn)
         except:
             os.remove(servname)
@@ -64,12 +51,9 @@ def psc(msize,mlist):
     return retval
 
 def hasadmin(message):
-    foundadmin = False
-    for i in message.author.roles:
-        if i.permissions.administrator == True:
-            foundadmin = True
+    for r in message.author.roles:
+        if r.permissions.administrator:
             return True
-    if foundadmin == False:
         return False
 
 # The Fun Stuff
@@ -100,11 +84,11 @@ async def on_message(message):
         retvalmain = message.content[len('!anysizelist'):].strip()
         if retvalmain == "":
             await client.send_message(message.channel,"**" + str(message.author) + "**, no arguments provided!")
-        elif is_int(retvalmain) == False:
+        elif not isinstance(retvalmain, int):
             await client.send_message(message.channel,"**" + str(message.author) + "**, invalid argument!")
         else:
             await client.send_message(message.channel,'**' + str(message.author) + "**, using list of " + retvalmain + ".")
-            while whilemetdone == False:
+            while True:
                 await client.send_message(message.channel,'Enter the PLACEMENT of a demon in that list with *!demon-anysizelist (demon)*. Say \'Done\' when done.')
                 def check(msg):
                     return msg.content.startswith('!demon-anysizelist')
@@ -112,11 +96,11 @@ async def on_message(message):
                 retval = message.content[len('!demon-anysizelist'):].strip()
                 if retval == "":
                     await client.send_message(message.channel, "**" + str(message.author) + "**, no demon specified!")
-                elif is_int(retval) == False and retval != 'Done':
+                elif not isinstance(retval, int) and retval != 'Done':
                     await client.send_message(message.channel, "**" + str(message.author) + "**, invalid demon!")
                 elif retval == 'Done':
-                    whilemetdone = True
-                elif is_int(retval) == True:
+                    break
+                elif isinstance(retval, int):
                     if int(retval) <= 0 or int(retval) > int(retvalmain):
                         await client.send_message(message.channel, "**" + str(message.author) + "**, demon out of range!")
                     elif retval in alslist:
@@ -130,7 +114,7 @@ async def on_message(message):
     if '!bonesbothelp' in message.content:
         await client.send_message(message.channel,boneshelp)
     if '!createtoplist' in message.content:
-        if hasadmin(message) == False:
+        if not hasadmin(message):
             await client.send_message(message.channel, "**" + str(message.author) + "**, you do not have permissions to use this command!")
         else:
             servfn = 'serverstats/bonesbot-' + message.server.id + '-hasdl.txt'
@@ -141,7 +125,7 @@ async def on_message(message):
             retvalmain = message.content[len('!createtoplist'):].strip()
             if retvalmain == '':
                 await client.send_message(message.channel, "**" + str(message.author) + "**, no argument provided!")
-            elif is_int(retvalmain) == False:
+            elif not isinstance(retvalmain, int):
                 await client.send_message(message.channel, "**" + str(message.author) + "**, invalid argument!")
             elif int(retvalmain) < 5:
                 await client.send_message(message.channel, "**" + str(message.author) + "**, the list needs to be greater than 5!")
